@@ -29,7 +29,8 @@ jobs:
           echo "PKG_VERSION_NAME=`cat VERSION`" >> "${PWD}/artifacts/env"
           echo "PKG_POSTFIX=${PKG_POSTFIX}" >> "${PWD}/artifacts/env"
       - name: Generate CPT package
-        run: |                                                                                          
+        run: |      
+            source ${PWD}/artifacts/env                                                                                    
             mkdir -p "${PWD}/install/lib/firmware/mrvl/"
             cp -r ${PWD}/files/ ${PWD}/install/lib/firmware/mrvl/
             mkdir -p "${PWD}/install/DEBIAN"
@@ -42,7 +43,7 @@ jobs:
             cd -
             mv "${PWD}/install" "${PWD}/cpt-cn10k_arm64"
             dpkg --build "${PWD}/cpt-cn10k_arm64"
-            cp "${PWD}/cpt-cn10k_arm64.deb" /artifacts/.
+            cp "${PWD}/cpt-cn10k_arm64.deb" ${PWD}/artifacts/.
       # Export version details
       # Delete existing release
       # Release package for own repo
