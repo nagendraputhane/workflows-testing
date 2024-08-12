@@ -31,7 +31,7 @@ jobs:
       - name: Generate CPT package
         run: |      
             source ${PWD}/artifacts/env
-            apt-get update -q -y
+            apt-get update -y
             apt-get install -y lsb-release
             DISTRO=ubuntu-`lsb_release -rs`
             echo "DISTRO=${DISTRO}" >> ${PWD}/artifacts/env                                                                                  
