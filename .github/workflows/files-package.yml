@@ -1,0 +1,70 @@
+name: package-firmware   #cpt-firmware-cn10k_<version>_arm64
+
+on:
+  push:
+  schedule:
+    - cron: "0 0 * * 1"
+  pull_request:
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+  packages: write
+
+jobs:
+  ubuntu-cn10k-package:
+    name: ubuntu-cn10k-arm64
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+      - name: Extract version details
+        id: version
+        run: |
+          mkdir -p "${PWD}/artifacts"
+          git tag --points-at HEAD > /tmp/tags
+          [ -s /tmp/tags ] && PKG_POSTFIX= || PKG_POSTFIX=-devel
+          echo "PKG_VERSION_NAME=`cat VERSION`" >> "${PWD}/artifacts/env"
+          echo "PKG_POSTFIX=${PKG_POSTFIX}" >> "${PWD}/artifacts/env"
+      - uses: uraimo/run-on-arch-action@v2.7.2 #is arch needed?
+        name: Generate CPT package
+        id: package
+        with:
+          arch: ${{ matrix.arch }}
+          distro: ${{ matrix.distro }}
+          githubToken: ${{ github.token }}
+          setup: |
+            mkdir -p ~/.ccache
+          dockerRunArgs: |
+            --volume "${PWD}/artifacts:/artifacts"
+            --volume "${HOME}/.ccache:/root/.ccache"
+          shell: /bin/bash
+          run: |                                                                                          
+            source /artifacts/env                                                                           #need any installs?
+            DISTRO=ubuntu-`lsb_release -rs` 
+            echo "DISTRO=${DISTRO}" >> /artifacts/env
+            export CC='ccache gcc-13'
+            echo "cache_dir = /root/.ccache" > /root/.ccache/ccache.conf
+            ccache -p
+            pkg-config --list-all
+            mkdir -p "${PWD}/package"
+            cp cpt/cpt05/* packages/.
+            mkdir -p "${PWD}/packages/DEBIAN"
+            #path for binaries /lib/firmware/cpt05
+            cd "${PWD}/packages/"
+            echo 'Package: cpt-cn10k'$PKG_POSTFIX >> DEBIAN/control                                         #what shall be the name? cpt-firmware-cn10k_<version>_arm64
+            echo 'Version: '$PKG_VERSION_NAME >> DEBIAN/control                                           
+            echo "Maintainer: Jerin Jacob (jerinj@marvell.com)" >> DEBIAN/control
+            echo "Architecture: arm64" >> DEBIAN/control
+            echo "Description: DPU Accelerator offload for Marvell Octeon 10" >> DEBIAN/control             #Description?
+            cd -
+            mv "${PWD}/packages" "${PWD}/cpt-cn10k_arm64"
+            dpkg --build "${PWD}/cpt-cn10k_arm64"
+            cp "${PWD}/cpt-cn10k_arm64.deb" /artifacts/.
+      # Export version details
+      # Delete existing release
+      # Release package for own repo
+      # Dispatch package update event for packages repo            
+                 
