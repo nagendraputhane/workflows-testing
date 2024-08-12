@@ -29,18 +29,16 @@ jobs:
           echo "PKG_VERSION_NAME=`cat VERSION`" >> "${PWD}/artifacts/env"
           echo "PKG_POSTFIX=${PKG_POSTFIX}" >> "${PWD}/artifacts/env"
       - name: Generate CPT package
-        run: |                                                                                          
+        run: |
           source ${PWD}/artifacts/env
-          #sudo apt-get update -q -y
-          #sudo apt-get install -y lsb-release
           DISTRO=ubuntu-`lsb_release -rs`
-          echo "DISTRO=${DISTRO}" >> ${PWD}/artifacts/env                                                                                  
+          echo "DISTRO=${DISTRO}" >> ${PWD}/artifacts/env
           mkdir -p "${PWD}/install/lib/firmware/mrvl/"
           cp -r "${PWD}/files/" ${PWD}/install/lib/firmware/mrvl/
           mkdir -p "${PWD}/install/DEBIAN"
           cd "${PWD}/install/"
-          echo 'Package: cpt-firmware-cn10k'$PKG_POSTFIX >> DEBIAN/control                                         
-          echo 'Version: '$PKG_VERSION_NAME >> DEBIAN/control                                           
+          echo 'Package: cpt-firmware-cn10k'$PKG_POSTFIX >> DEBIAN/control
+          echo 'Version: '$PKG_VERSION_NAME >> DEBIAN/control
           echo "Maintainer: Jerin Jacob (jerinj@marvell.com)" >> DEBIAN/control
           echo "Architecture: arm64" >> DEBIAN/control
           echo "Description: DPU Accelerator offload for Marvell Octeon 10" >> DEBIAN/control
@@ -49,12 +47,15 @@ jobs:
           dpkg --build "${PWD}/cpt-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
           ls -ltr
           cp -r "${PWD}/cpt-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64.deb" ${PWD}/artifacts/.
+      - name: Generate ML package
+        run: |
+          source ${PWD}/artifacts/env
           mkdir -p "${PWD}/install/lib/firmware/mrvl/"
           cp -r "${PWD}/files/" ${PWD}/install/lib/firmware/mrvl/
           mkdir -p "${PWD}/install/DEBIAN"
           cd "${PWD}/install/"
-          echo 'Package: ml-firmware-cn10k'$PKG_POSTFIX >> DEBIAN/control                                         
-          echo 'Version: '$PKG_VERSION_NAME >> DEBIAN/control                                           
+          echo 'Package: ml-firmware-cn10k'$PKG_POSTFIX >> DEBIAN/control
+          echo 'Version: '$PKG_VERSION_NAME >> DEBIAN/control
           echo "Maintainer: Jerin Jacob (jerinj@marvell.com)" >> DEBIAN/control
           echo "Architecture: arm64" >> DEBIAN/control
           echo "Description: DPU Machine Learning Accelerator offload for Marvell Octeon 10" >> DEBIAN/control
@@ -109,5 +110,5 @@ jobs:
           files: |
               ${{ github.workspace }}/artifacts/ml-cn10k${{ steps.artifacts.outputs.PKG_POSTFIX }}_${{ steps.artifacts.outputs.PKG_VERSION_NAME }}_arm64.deb
 
-      # Dispatch package update event for packages repo            
-                 
+      # Dispatch package update event for packages repo
+
