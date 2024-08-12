@@ -30,7 +30,6 @@ jobs:
           echo "PKG_POSTFIX=${PKG_POSTFIX}" >> "${PWD}/artifacts/env"
       - name: Generate CPT package
         run: |                                                                                          
-            source /artifacts/env                                                                           
             mkdir -p "${PWD}/install/lib/firmware/mrvl/"
             cp -r ${PWD}/files/ ${PWD}/install/lib/firmware/mrvl/
             mkdir -p "${PWD}/install/DEBIAN"
