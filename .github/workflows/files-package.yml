@@ -28,39 +28,20 @@ jobs:
           [ -s /tmp/tags ] && PKG_POSTFIX= || PKG_POSTFIX=-devel
           echo "PKG_VERSION_NAME=`cat VERSION`" >> "${PWD}/artifacts/env"
           echo "PKG_POSTFIX=${PKG_POSTFIX}" >> "${PWD}/artifacts/env"
-      - uses: uraimo/run-on-arch-action@v2.7.2 #is arch needed?
-        name: Generate CPT package
-        id: package
-        with:
-          arch: ${{ matrix.arch }}
-          distro: ${{ matrix.distro }}
-          githubToken: ${{ github.token }}
-          setup: |
-            mkdir -p ~/.ccache
-          dockerRunArgs: |
-            --volume "${PWD}/artifacts:/artifacts"
-            --volume "${HOME}/.ccache:/root/.ccache"
-          shell: /bin/bash
-          run: |                                                                                          
-            source /artifacts/env                                                                           #need any installs?
-            DISTRO=ubuntu-`lsb_release -rs` 
-            echo "DISTRO=${DISTRO}" >> /artifacts/env
-            export CC='ccache gcc-13'
-            echo "cache_dir = /root/.ccache" > /root/.ccache/ccache.conf
-            ccache -p
-            pkg-config --list-all
-            mkdir -p "${PWD}/package"
-            cp cpt/cpt05/* packages/.
-            mkdir -p "${PWD}/packages/DEBIAN"
-            #path for binaries /lib/firmware/cpt05
-            cd "${PWD}/packages/"
-            echo 'Package: cpt-cn10k'$PKG_POSTFIX >> DEBIAN/control                                         #what shall be the name? cpt-firmware-cn10k_<version>_arm64
+      - name: Generate CPT package
+        run: |                                                                                          
+            source /artifacts/env                                                                           
+            mkdir -p "${PWD}/install/lib/firmware/mrvl/"
+            cp -r ${PWD}/files/ ${PWD}/install/lib/firmware/mrvl/
+            mkdir -p "${PWD}/install/DEBIAN"
+            cd "${PWD}/install/"
+            echo 'Package: cpt-cn10k'$PKG_POSTFIX >> DEBIAN/control                                         
             echo 'Version: '$PKG_VERSION_NAME >> DEBIAN/control                                           
             echo "Maintainer: Jerin Jacob (jerinj@marvell.com)" >> DEBIAN/control
             echo "Architecture: arm64" >> DEBIAN/control
-            echo "Description: DPU Accelerator offload for Marvell Octeon 10" >> DEBIAN/control             #Description?
+            echo "Description: DPU Accelerator offload for Marvell Octeon 10" >> DEBIAN/control
             cd -
-            mv "${PWD}/packages" "${PWD}/cpt-cn10k_arm64"
+            mv "${PWD}/install" "${PWD}/cpt-cn10k_arm64"
             dpkg --build "${PWD}/cpt-cn10k_arm64"
             cp "${PWD}/cpt-cn10k_arm64.deb" /artifacts/.
       # Export version details
