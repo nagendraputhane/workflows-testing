@@ -47,7 +47,7 @@ jobs:
           cd -
           mv "${PWD}/install" "${PWD}/cpt-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
           dpkg --build "${PWD}/cpt-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
-          ls -ltr "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
+          ls -ltr "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64.deb"
           cp -r "${PWD}/cpt-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64.deb" ${PWD}/artifacts/.
           mkdir -p "${PWD}/install/lib/firmware/mrvl/"
           cp -r "${PWD}/files/" ${PWD}/install/lib/firmware/mrvl/
@@ -61,7 +61,7 @@ jobs:
           cd -
           mv "${PWD}/install" "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
           dpkg --build "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
-          ls -ltr "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64"
+          ls -ltr "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64.deb"
           cp -r "${PWD}/ml-firmware-cn10k${PKG_POSTFIX}_${PKG_VERSION_NAME}_arm64.deb" ${PWD}/artifacts/.
       - name: Export version name
         id: artifacts
