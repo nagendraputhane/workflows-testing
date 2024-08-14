@@ -34,7 +34,7 @@ jobs:
           DISTRO=ubuntu-`lsb_release -rs`
           echo "DISTRO=${DISTRO}" >> ${PWD}/artifacts/env
           mkdir -p "${PWD}/install/lib/firmware/mrvl/"
-          cp -r "${PWD}/files/*" ${PWD}/install/lib/firmware/mrvl/
+          cp -r ${PWD}/files/* ${PWD}/install/lib/firmware/mrvl/
           mkdir -p "${PWD}/install/DEBIAN"
           cd "${PWD}/install/"
           echo 'Package: cpt-firmware-cn10k'$PKG_POSTFIX >> DEBIAN/control
